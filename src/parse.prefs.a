@@ -6,6 +6,7 @@
 ; Public functions
 ; - pref_get
 ; - pref_set
+; - SaveSmallFile
 ;
 ; Public constants (all length-prefixed strings)
 ; - kNextAttract
@@ -68,7 +69,7 @@ kCheat
          +STAY $00
          ldy   #0
          lda   ($00),y
-         beq   +
+         beq   PREFRTS
          tay
          clc
          adc   $FE
@@ -78,9 +79,9 @@ kCheat
          sta   ($FE),y
          bne   -
          stx   $FE
-         bcc   +
+         bcc   PREFRTS
          inc   $FF
-+        rts
+PREFRTS  rts
 
 ;------------------------------------------------------------------------------
 ; pref_get
@@ -122,7 +123,7 @@ pref_get
 +        !word $FDFD                 ; SMC
          bcs   .useDefaultValue      ; if pref key is not found, use default value
          ldx   .store1+1
-         beq   .done                 ; if no OKVS to validate against, we're done
+         beq   PREFRTS               ; if no OKVS to validate against, we're done
          +STAY +
          +STAY PTR
          ldy   #0
@@ -136,8 +137,7 @@ pref_get
          ldx   #0
 +
          +LDAY .store1
-         jsr   okvs_nth
-.done    rts
+         jmp   okvs_nth
 
 ;------------------------------------------------------------------------------
 ; pref_set
@@ -205,3 +205,21 @@ pref_set
          jsr   SetPath
          +LDAY kGlobalPrefsBuffer
          ; /!\ execution falls through here to glue.prorwts/SaveSmallFile
+;------------------------------------------------------------------------------
+; SaveSmallFile
+; Save a file into memory all at once, using ProRWTS2.
+; /!\ Only first block (512 bytes) is written. Keep those files small. /!\
+; /!\ All 512 bytes are written to disk. Clear buffer before calling. /!\
+;
+; supports paths, see note
+;
+; in:    A/Y points to data buffer
+;        gPathname contains path+filename to write
+; out:   all flags clobbered
+;        all registers clobbered
+;------------------------------------------------------------------------------
+SaveSmallFile
+         +STAY ldrlo                 ; set data buffer address for ProRWTS2
+         jsr   SwitchToBank2
+         jsr   SaveSmallFileInternal
+         jmp   SwitchToBank1

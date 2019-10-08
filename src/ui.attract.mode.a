@@ -69,15 +69,13 @@ MegaAttractMode
 ; MiniAttractMode
 ; run attract modules related to one game
 ;
-; in:    X = index in gGamesListStore
-;        gGlobalPrefsStore must be initialized
+; in:    gGameToLaunch = index in gGamesListStore
 ; out:   all flags and registers clobbered
 ;        assume all of main memory has been clobbered
 ;------------------------------------------------------------------------------
 MiniAttractMode
-         +LDADDR gGamesListStore
-         jsr   okvs_nth
-         +STAY @fname
+         jsr   GetGameToLaunch
+         +STAY +
 
          jsr   BlankHGR
 
@@ -86,7 +84,7 @@ MiniAttractMode
 @loop
          jsr   LoadFile              ; load mini attract mode configuration file into $8000
          !word kMiniAttractDirectory
-@fname   !word $FDFD                 ; SMC
++        !word $FDFD                 ; SMC
 -        !word $8000
 
          jsr   ParseKeyValueList     ; parse configuration into OKVS data structure at $6000
@@ -97,7 +95,7 @@ MiniAttractMode
          +LDADDR gAttractModeStore
          jsr   okvs_len
          cmp   @MiniAttractIndex
-         beq   @exit                 ; we've run through all modules, so exit to caller
+         beq   ATTRTS                ; we've run through all modules, so exit to caller
 
 @MiniAttractIndex=*+1
          ldx   #$FD                  ; SMC
@@ -114,7 +112,7 @@ MiniAttractMode
          inc   @MiniAttractIndex
          lda   KBD
          bpl   @loop
-@exit    rts
+ATTRTS   rts
 
 ;------------------------------------------------------------------------------
 ; RunAttractModule
@@ -144,9 +142,7 @@ RunAttractModule
 
          +LDAY @key
          jsr   GetGameInfo
-         bcc   +                     ; if game doesn't exist, skip the demo
-         rts
-+
+         bcs   ATTRTS                ; if game doesn't exist, skip the demo
          cpx   #$FF
          beq   +
          stx   gGameToLaunch
