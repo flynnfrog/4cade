@@ -4,47 +4,11 @@
 ; miscellaneous UI functions
 ;
 ; Public functions
-; - SoftBell
 ; - Home
-; - BlankHGR
 ; - BlankDHGR
-; - ExecuteTransitionAndWait
-; - WaitForKeyFor30Seconds
-; - CoverFade
+; - IsSearchKey
+; - IsUpDownOrRightArrow
 ;
-
-;------------------------------------------------------------------------------
-; SoftBell
-; yell at the user, but, like, gently
-;
-; in:    none
-; out:   C clear
-;        Y preserved
-;        A=0
-;        X=0
-;        all flags preserved
-;------------------------------------------------------------------------------
-SoftBell
-         ldx   #32
--        lda   #2
-         jsr   @wait
-         bit   SPEAKER
-         lda   #33
-         jsr   @wait
-         bit   SPEAKER
-         dex
-         bne   -
-         clc
-         rts
-@wait ; identical to $FCA8 ROM routine, but ROM is switched out when we need it
-         sec
---       pha
--        sbc   #1
-         bne   -
-         pla
-         sbc   #1
-         bne   --
-         rts
 
 ;------------------------------------------------------------------------------
 ; Home
@@ -103,95 +67,44 @@ BlankDHGR
          jmp   HGRMode
 
 ;------------------------------------------------------------------------------
-; BlankHGR
-; clear and show HGR page 1 without flickering
+; IsSearchKey
+; test whether accumulator contains a key that might trigger a new textrank
+; search
 ;
-; in:    none
-; out:   text page clobbered (but screen holes preserved)
-;        $2000..$3FFF cleared
+; in:    A = key
+; out:   A &= 0x7F
+;        Y preserved
+;        X clobbered
+;        Z = 1 if this is a search key
+;        Z = 0 if this is not a search key
 ;------------------------------------------------------------------------------
-BlankHGR
-         jsr   Home
-         jsr   ClearHGR1             ; clear hi-res screen 1
-         bit   PAGE1                 ; show hi-res screen 1 (now blank)
-         ; execution falls through here
-;------------------------------------------------------------------------------
-; HGRMode
-; twiddles softswitches to set HGR mode (does not set page 1 or 2)
-;
-; in:    none
-; out:   all registers preserved
-;------------------------------------------------------------------------------
-HGRMode
-         bit   $C057
-         bit   $C052
-         bit   $C050
+IsSearchKey
+         and   #$7F                  ; strip high bit for search characters
+         cmp   #$30                  ; control keys and punctuation ignored
+         bcc   @badkey
+         cmp   #$3A                  ; numbers are good input
+         bcc   @goodkey
+         cmp   #$41                  ; more punctuation (also ignored)
+         bcc   @badkey
+         cmp   #$5B                  ; uppercase letters are good input
+         bcs   +
+         ora   #$20                  ; convert uppercase letters to lowercase
+@goodkey
+         ldx   #0
          rts
 
-;------------------------------------------------------------------------------
-; ExecuteTransitionAndWait
-; call transition effect code (address passed in) and wait a period of time
-; or until the user presses a key
-;
-; in:    A/Y = address of transition effect code
-; out:   all flags and registers clobbered
-;------------------------------------------------------------------------------
-ExecuteTransitionAndWait
-         +STAY @j+1
-@j       jsr   $FDFD                 ; SMC call transition effect code
-         ldx   #$20                  ; picture is showing so now we wait
--        lda   #0
-         jsr   WaitForKeyWithTimeout
-         bmi   +
-         dex
-         bpl   -
-+        lda   KBD
-         cmp   #$95
-         bne   ConvenientlyPlacedRTS
-         bit   CLEARKBD
-ConvenientlyPlacedRTS
++        cmp   #$61                  ; more punctuation (also ignored)
+         bcc   @badkey
+         cmp   #$7B                  ; lowercase letters are good input
+         bcc   @goodkey
+@badkey
+         ldx   #1
          rts
 
-; /!\ keep this last in the file to ensure it doesn't cross a page boundary /!\
-;------------------------------------------------------------------------------
-; WaitForKeyFor30Seconds
-; does what it says on the tin
-;
-; in:    none
-; out:   if user presses a key before the timer runs out, exits with A = key
-;          and X/Y preserved
-;        otherwise exits via MegaAttractMode and everything is clobbered
-;------------------------------------------------------------------------------
-WaitForKeyFor30Seconds
-         lda   #$16                  ; initialize timeout counters
-         sta   Timeout
-         sta   Timeout+1
-         sta   Timeout+2
-@loop
-         lda   KBD
-         bmi   ConvenientlyPlacedRTS
-
-         inc   RNDSEED+1             ; these are only ever incremented, never
-         bne   +                     ; reset (may be used as a pseudorandom
-         inc   RNDSEED               ; seed)
-+
-         dec   Timeout
-         bne   @loop
-         dec   Timeout+1
-         bne   @loop
-         dec   Timeout+2
-         bne   @loop
-         ; execution falls through here
-CoverFade
-         jsr   LoadCoverOffscreen
-         jsr   ShowOtherPage
-         lda   OffscreenPage
-         bne   +
-         jsr   LoadCoverOffscreen
-         jsr   ShowOtherPage
-+        jsr   LoadFile              ; load transition effect code at $6000
-         !word kFXDirectory
-         !word kCoverFadeFile
-         !word $6000
-         jsr   $6000                 ; call transition effect
-         jmp   MegaAttractMode       ; exit via mega attract mode
+IsUpDownOrRightArrow
+         cmp   #$8B                  ; up arrow
+         beq   @done
+         cmp   #$95                  ; right arrow
+         beq   @done
+         cmp   #$8A                  ; down arrow
+@done    rts
