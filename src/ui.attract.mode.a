@@ -56,14 +56,11 @@ MegaAttractMode
          +LDAY @mname                ; A/Y = address of module name
          jsr   RunAttractModule
          lda   KBD
-         bpl   @jmpattract
+         bpl   MegaAttractMode
          cmp   #$8D                  ; Enter plays the game shown on screen.
-         bne   @jmpsearch            ; Any other key switches to Search Mode.
+         bne   +                     ; Any other key switches to Search Mode.
          jsr   PlayGame              ; (might return if user hits Ctrl-Reset)
-@jmpattract
-         jmp   MegaAttractMode
-@jmpsearch
-         jmp   SearchMode
++        jmp   SearchMode
 
 ;------------------------------------------------------------------------------
 ; MiniAttractMode
@@ -78,9 +75,8 @@ MiniAttractMode
          +STAY +
 
          jsr   BlankHGR
-
-         lda   #0
-         sta   @MiniAttractIndex
+                                     ; X = 0
+         stx   @MiniAttractIndex
 @loop
          jsr   LoadFile              ; load mini attract mode configuration file into $8000
          !word kMiniAttractDirectory
@@ -153,13 +149,6 @@ RunAttractModule
          !word kPrelaunchDirectory
          !word kStandardPrelaunch
          !word $0106
-
-         ldy   kDemoDirectory
-         sty   ProDOS_prefix         ; temporarily set 'root' directory to
--        lda   kDemoDirectory, y     ; /demos/ directory so demos can can load
-         sta   ProDOS_prefix, y      ; other resources in the same directory
-         dey
-         bne   -
 
          jsr   LoadFile              ; load self-running demo into its default address (varies)
          !word kDemoDirectory
