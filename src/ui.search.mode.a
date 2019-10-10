@@ -73,9 +73,6 @@ InputKeyDispatch
          jsr   IsSearchKey
          beq   .foundSearchKey
          ldx   #kInputError
-         +HIDE_NEXT_2_BYTES
-.IsArrow
-         ldx   #kInputBrowse
 !if kInputSearch > 0 {
          +HIDE_NEXT_2_BYTES
 .foundSearchKey
@@ -121,8 +118,9 @@ SearchMode
          ; we want to switch to Browse Mode with the keyboard still hot so
          ; that mode finds and dispatches the arrow key.
 
+         ldx   #kInputBrowse
          jsr   IsUpDownOrRightArrow
-         beq   .IsArrow
+         beq   .InputDispatch
          bit   CLEARKBD
 
          ldy   #kNumBrowseKeys
@@ -134,22 +132,21 @@ SearchMode
          bne   .InputDispatch        ; always branches
 
 OnClear
-         ldx   InputLength
+         ldx   #1                    ; Esc with input clears the input
+         ldy   InputLength
          bne   +
          jmp   CoverFade             ; Esc with no input transitions to
                                      ; mega attract mode
 OnBack
          ldx   InputLength
          beq   OnError
-         +HIDE_NEXT_2_BYTES
-+        ldx   #1                    ; Esc with input clears the input
-         dex
++        dex
          stx   InputLength
          bpl   OnInputChanged        ; always branches
 
 OnTab
          ldx   gGameToLaunch
-         cpx   #$FF
+         inx
          beq   OnError
          jsr   MiniAttractMode
          cmp   #$8D                  ; if we exited mini attract mode
@@ -157,7 +154,7 @@ OnTab
 
 OnLaunch
          ldx   gGameToLaunch
-         cpx   #$FF
+         inx
          beq   OnError
          jsr   PlayGame
 
@@ -178,10 +175,10 @@ OnSearch
          inc   InputLength
          ; execution falls through here to OnInputChanged
 OnInputChanged
-         lda   InputLength
+         ldx   InputLength
          bne   FindMatchingTitle
                                      ; no input, reset params and UI
-         ldx   #$FF
+         dex
          stx   gGameToLaunch         ; no game selected
          jsr   LoadTitleOffscreen
          jsr   DrawUIWithoutDots
@@ -243,14 +240,12 @@ SoftBell
 +
          ldx   BestMatchIndex        ; check if the new best match is the same
          cpx   gGameToLaunch         ; as the current best match
-         stx   gGameToLaunch
          bne   +
          jsr   ToggleOffscreenPage   ; Since we're not loading a new screenshot
                                      ; we fake switching the 'offscreen' page
                                      ; in order to draw on the visible page.
          bpl   @noload               ; (always branches)
-+        jsr   LoadGameTitleOffscreen
++        stx   gGameToLaunch
+         jsr   LoadGameTitleOffscreen
 @noload  jsr   DrawUI
-         jsr   SwitchToBank2
-         jsr   DisableAcceleratorAndSwitchToBank1
          ; /!\ execution falls through to ui.animation/MaybeAnimateTitle
