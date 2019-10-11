@@ -3,22 +3,24 @@
 ## New & changed games
 
  - Added Flight Simulator II
+ - Added Guardian
  - Added Short Circuit
  - Removed Flight Simulator I
- - Combined Tetris 48K and Tetris 128K into one entry; just launch Tetris and it'll figure it out
+ - Combined Tetris 48K and Tetris 128K; just launch Tetris and it'll figure it out
 
 ## Enhancements & bug fixes
 
  - Added help screen (press ? in search or browse mode to show)
  - Added global cheat mode (press Ctrl-C in search or browse mode to toggle)
- - Added 58 game cheats
+ - Added 59 game cheats
  - Fixed corrupted graphics in Asteroid Blaster
  - Fixed corrupted graphics in Sneakers game, demo, and screenshots, and now we are entirely done with this I promise
  - Fixed Axis Assassin demo hanging on IIgs
+ - Fixed a crash in Agent USA
  - Added missing levels in Out Of This World
  - Removed latent copy protection in Sea Dragon (sneaky sneaky)
  - Enable fast machine speed or accelerator (if available) to speed up searching, browsing, and game launching
- - Prevent flashes of other game screenshots while loading the game you actually want
+ - Prevent flashes of other game screenshots while loading a demo or game
  - Detect VidHD in passive mode
  - Fixed a freeze on startup with certain accelerators
  - Fixed a crash on Apple ][+
