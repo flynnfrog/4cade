@@ -12,7 +12,7 @@
 
  - Added help screen (press ? in search or browse mode to show)
  - Added global cheat mode (press Ctrl-C in search or browse mode to toggle)
- - Added 66 game cheats
+ - Added 71 game cheats
  - Fixed corrupted graphics in Asteroid Blaster
  - Fixed corrupted graphics in Sneakers game, demo, and screenshots, and now we are entirely done with this I promise
  - Fixed Axis Assassin demo hanging on Apple IIgs
@@ -21,11 +21,10 @@
  - Removed latent copy protection in Sea Dragon (sneaky sneaky)
  - Enable fast machine speed or accelerator (if available) to speed up searching, browsing, and game launching
  - Prevent flashes of other game screenshots while loading a demo or game
- - Detect VidHD in passive mode
  - Fixed a freeze on startup with certain accelerators
  - Fixed a crash on Apple ][+
  - Fixed choppy sound in some games on Apple IIgs
- - Fixed launching from MicroDrive partition 3+
+ - Fixed launching from MicroDrive partition 3+ (in progress)
  - Fixed launching from CFFA 3000 partition 5+
  - Fixed launching from RamFAST "GS/OS partitions"
  - Fixed launching from ProDOS 2.5
