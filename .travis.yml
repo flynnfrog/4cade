@@ -20,7 +20,7 @@ before_deploy:
   - git config --local user.name "travis-ci"
   - git config --local user.email "notthe9@oclocknews"
   - export TRAVIS_TAG="daily"
-  - git tag -fa $TRAVIS_TAG
+  - git tag -fa $TRAVIS_TAG -m "Automatic build from Travis CI"
 
 deploy:
   provider: releases
