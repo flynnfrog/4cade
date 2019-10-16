@@ -1,0 +1,19 @@
+name: Fork Sync
+  
+on:
+  schedule:
+  - cron: '*/30 * * * *'
+
+jobs:
+  sync:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: TG908/fork-sync@v1.1.4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        owner: a2-4am
+        base: master
+        head: master
+        pr_title: "Upstream sync"
