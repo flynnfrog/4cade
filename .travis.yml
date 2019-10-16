@@ -34,8 +34,3 @@ deploy:
   overwrite : true
   on:
     branch: master
- 
- # blocklist
-branches:
-  except:
-    - /^untagged-.*/
