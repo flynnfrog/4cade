@@ -3,3 +3,4 @@ rules:
   - base: master
     upstream: a2-4am:master
     mergeMethod: merge
+label: ":arrow_heading_down: pull" 
