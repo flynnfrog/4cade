@@ -2,7 +2,7 @@
 ;(c) 2019 by 4am
 ;
 !cpu 6502
-!to "build/FX/SOFT.DIAGONAL",plain
+!to "build/FX/SOFT.R",plain
 *=$6000
 
 y = $fc
@@ -19,16 +19,14 @@ counter = $ff
          +INIT_MASKS sourcemasks5, copymasks5
          +INIT_MASKS sourcemasks6, copymasks6
 
-         lda   #(40+24+7-1) ; columns + rows + blocks per row - 1
+         lda   #(40+7-1)  ; columns + blocks per row - 1
          sta   counter
 
-         lda   #39
+         lda   #0
          sta   col
 ColLoop
          lda   #23
          sta   row
-         ldy   col
-         sty   y
          jsr   WaitForVBL
 RowLoop
          ; [speedopt] calculate HGR base addresses once per row
@@ -38,7 +36,7 @@ RowLoop
          asl
          +HGR_CALC
 
-         ldy   y
+         ldy   col
          +IS_Y_OFFSCREEN
          bcs   @block2
 
@@ -59,7 +57,7 @@ RowLoop
          ; [speedopt] reset HGR base addresses instead of recalculating them from scratch
          +RESET_HGR_CALC
 @block2
-         iny
+         dey
          +IS_Y_OFFSCREEN
          bcs   @block3
 
@@ -78,7 +76,7 @@ RowLoop
 
          +RESET_HGR_CALC
 @block3
-         iny
+         dey
          +IS_Y_OFFSCREEN
          bcs   @block4
 
@@ -97,7 +95,7 @@ RowLoop
 
          +RESET_HGR_CALC
 @block4
-         iny
+         dey
          +IS_Y_OFFSCREEN
          bcs   @block5
 
@@ -116,7 +114,7 @@ RowLoop
 
          +RESET_HGR_CALC
 @block5
-         iny
+         dey
          +IS_Y_OFFSCREEN
          bcs   @block6
 
@@ -135,7 +133,7 @@ RowLoop
 
          +RESET_HGR_CALC
 @block6
-         iny
+         dey
          +IS_Y_OFFSCREEN
          bcs   @block7
 
@@ -154,7 +152,7 @@ RowLoop
 
          +RESET_HGR_CALC
 @block7
-         iny
+         dey
          +IS_Y_OFFSCREEN
          bcs   @nextrow
 
@@ -169,14 +167,11 @@ RowLoop
 
          ; don't need RESET_HGR_CALC here because we're done with this row
 @nextrow
-         ldy   y
-         iny
-         sty   y
          dec   row
          +LBPL RowLoop
          lda   $c000
          bmi   @exit
-         dec   col
+         inc   col
          dec   counter
          +LBNE ColLoop
 @exit    rts
