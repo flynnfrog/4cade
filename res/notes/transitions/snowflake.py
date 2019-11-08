@@ -3,12 +3,12 @@
 import PIL.Image # https://pillow.readthedocs.io/
 import util
 
-# apple72.png is the source image. The source image MUST have a white background,
+# snowflake.png is the source image. The source image MUST have a white background,
 # but other colors and pixel depth are irrelevant. This one is black & white.
 # Due to the Apple II pixel aspect ratio, we do a 1-time aspect-ratio-losing resize
 # to squash the image to 87% height.
 #
-# $ gm convert apple72.png -resize "100%x87%!" squash.png
+# $ gm convert snowflake.png -resize "100%x87%!" squash.png
 # (Depending on your shell, you may need to escape the exclamation point. Grr.)
 #
 # Now we can create individual images for each "frame" of the animation, by
@@ -46,28 +46,28 @@ import util
 # simply listed as separate coordinate pairs, each with a bitmask that
 # includes 1 pixel instead of 2.
 
-frames = 500 # number of "thumbN.png" files
+frames = 1000 # number of "thumbN.png" files
 
 coords = []
-for i in range(1, frames+1):
-    p = PIL.Image.open("apple/thumb%s.png" % i)
-    for x in range(0, 280, 2):
-        for y in range(0, 192, 3):
+for i in range(5, frames, 5):
+    p = PIL.Image.open("snowflake/thumb%s.png" % i)
+    for x in range(0, 280//2):
+        for y in range(0, 192//2, 2):
             if p.getpixel((x,191-y))[0] != 255:
                 coords.append((x,y))
 
 unique_coords = util.unique(coords)
-unique_vals = util.vals_3bit(unique_coords)
-with open("../../../src/fx/fx.hgr.apple.data.a", "w") as f:
+unique_vals = util.vals_1bit(unique_coords)
+with open("../../../src/fx/fx.hgr.snowflake.data.a", "w") as f:
     for aval, bval in unique_vals:
         f.write("         !byte %s,%s\n" % (aval, bval))
 
 ripple_vals = util.ripple(unique_vals)
-with open("../../../src/fx/fx.hgr.apple.ripple.data.a", "w") as f:
+with open("../../../src/fx/fx.hgr.snowflake.ripple.data.a", "w") as f:
     for aval, bval in ripple_vals:
         f.write("         !byte %s,%s\n" % (aval, bval))
 
 unique_vals.reverse()
-with open("../../../src/fx/fx.hgr.apple.in.data.a", "w") as f:
+with open("../../../src/fx/fx.hgr.snowflake.in.data.a", "w") as f:
     for aval, bval in unique_vals:
         f.write("         !byte %s,%s\n" % (aval, bval))
