@@ -9,6 +9,7 @@
 ; - DHGRSingle
 ; - BlankHGR
 ; - HGRMode
+; - RedrawForDHGR
 ;
 
 ;------------------------------------------------------------------------------
@@ -88,6 +89,8 @@ BlankHGR
          jsr   Home
          jsr   ClearHGR1             ; clear hi-res screen 1
          bit   PAGE1                 ; show hi-res screen 1 (now blank)
+         lda   #1
+         sta   OffscreenPage
          ; /!\ execution falls through here to HGRMode
 ;------------------------------------------------------------------------------
 ; HGRMode
@@ -102,6 +105,12 @@ GRMode
          bit   $C052
          bit   $C050
 DHGRRTS  rts
+
+ForceHGRMode
+gMachineInDHGRMode=*+1
+         lda   #$00
+         bne   BlankHGR
+         beq   DHGRRTS
 
 ;------------------------------------------------------------------------------
 ; LoadDHGRTransition [private]
@@ -209,7 +218,7 @@ DHGRActionCallback
          +HIDE_NEXT_2_BYTES
 DrawGameTitleInActionSlideshowHGR
          lda   #$60                  ; RTS
-         sta   @fallThroughForDHGR
+         sta   @fallthroughForDHGR
 
          ; display game name in the bottom-left corner
          lda   #22
@@ -247,67 +256,48 @@ DrawGameTitleInActionSlideshowHGR
 @drawline
          ldy   gPathname
          sta   gPathname,y
-         lda   HTAB
-         pha
          +LDADDR gPathname
          sec
          jsr   DrawString
-         pla
-@fallThroughForDHGR
+@fallthroughForDHGR
          nop                         ; SMC
-         sta   HTAB
+         ; /!\ execution sometimes falls through here to RedrawForDHGR
+
+;------------------------------------------------------------------------------
+; RedrawForDHGR
+; After drawing text on HGR screen, this will transform the low-level bytes
+; to display properly on the DHGR screen.
+;
+; /!\ must be called immediately after calling one of the font drawing routines
+;     (Draw40Chars, DrawCenteredString, DrawString, DrawBuffer)
+;
+; in:    gPathname contains number of bytes to transform
+;        DBIRow0/LC2 contains address of first byte of first row to transform
+;          (this will be true if you just called DrawBufferInternal or
+;           something that calls it, see above)
+; out:   clobbers zero page $00,$01,$02,$26,$27,$F7
+;------------------------------------------------------------------------------
+RedrawForDHGR
          jsr   SwitchToBank2
          +LDAY DBIRow0+1
-         +STAY $FE
+         +STAY $26
          lda   #8
          sta   i
 --       ldy   gPathname
          dey
--        lda   ($FE),y
-         jsr   HGRByteToDHGRBytes
-         sta   ($FE),y
+-        lda   ($26),y
+         +HGR_BYTE_TO_DHGR_BYTES
+         sta   ($26),y
          txa
          sta   WRITEAUXMEM
-         sta   ($FE),y
+         sta   ($26),y
          sta   WRITEMAINMEM
          dey
          bpl   -
-         lda   $FF
+         lda   $27
          clc
          adc   #$04
-         sta   $FF
+         sta   $27
          dec   i
          bne   --
          jmp   SwitchToBank1
-
-HGRByteToDHGRBytes
-;1GFEDCBA ->
-;1GGFFEED (main) +
-;1DCCBBAA (aux)
-;
-; in:    A = HGR byte
-; out:   A = DHGR byte in mainmem
-;        X = DHGR byte in auxmem
-;        preserves Y
-;        clobbers zero page $00,$01,$02
-
-         sty   $02
-         ldy   #$02
---       stx   $01
-         ldx   #$04
--        ror   $00                   ; duplicate previous bit
-         lsr                         ; fetch bit
-         php
-         ror   $00                   ; insert bit
-         plp
-         dex
-         bne   -
-         ldx   $00
-         dey
-         bne   --
-         txa
-         sec
-         ror   $01                   ; set bit 7 explicitly on auxmem value
-         ldx   $01
-         ldy   $02
-         rts
