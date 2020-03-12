@@ -6,7 +6,7 @@ os: osx
 osx_image: xcode9.4
 
 install:
-  - HOMEBREW_NO_AUTO_UPDATE=1 brew install acme rom-tools
+  - HOMEBREW_NO_AUTO_UPDATE=1 brew install acme rom-tools exomizer
   - wget https://www.brutaldeluxe.fr/products/crossdevtools/cadius/Cadius_v1.4_mac.zip
   - unzip ./Cadius_v1.4_mac.zip
   - chmod +x ./cadius
