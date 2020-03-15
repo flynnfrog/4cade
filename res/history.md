@@ -22,12 +22,12 @@
  - Street Sports Football
  - Street Sports Soccer
  - Summer Games
- - Summer Games II
+ - Summer Games II [needs screenshots]
  - Super Zaxxon
- - TechnoCop
- - Triad
+ - TechnoCop [needs screenshots]
+ - Triad [needs screenshots]
  - Wings of Fury
- - Winter Games
+ - Winter Games [needs screenshots]
 
 ## Removed games
 
