@@ -1,5 +1,5 @@
 ;License:MIT
-;(c) 2018-9 by 4am
+;(c) 2018-2020 by 4am
 ;
 ; routines for drawing the UI overlay (search bar, browse bar, instructions, cheat mode)
 ; on top of whatever else is on the screen
@@ -20,16 +20,18 @@ ReturnToPlay
          !byte $0D
          !text " to play"
 
-kCheatsEnabled = 3                  ; index of 'cheats enabled' string in following table
+kCheatsEnabled = 4                  ; index of 'cheats enabled' string in following table
 kCheatDescriptionLo
          !byte <sNoCheats
          !byte <sInfiniteLives
          !byte <sInfiniteLivesAndWeapons
+         !byte <sInvincibility
          !byte <sCheatsEnabled
 kCheatDescriptionHi
          !byte >sNoCheats
          !byte >sInfiniteLives
          !byte >sInfiniteLivesAndWeapons
+         !byte >sInvincibility
          !byte >sCheatsEnabled
 sNoCheats
          !byte 8          ; length
@@ -46,6 +48,13 @@ sInfiniteLivesAndWeapons
          !byte $16        ; bolt character
          !text " "
          !text "infinite lives & weapons"
+         !text " "
+         !byte $16        ; bolt character
+sInvincibility
+         !byte 14         ; length
+         !byte $16        ; bolt character
+         !text " "
+         !text "invincible"
          !text " "
          !byte $16        ; bolt character
 sCheatsEnabled

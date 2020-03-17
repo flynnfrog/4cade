@@ -11,6 +11,7 @@
  - Gauntlet
  - Genius
  - Genius 2
+ - Miner 2049er II
  - Ming's Challenge
  - One on One
  - Penetrator
@@ -24,7 +25,7 @@
  - Summer Games
  - Summer Games II
  - Super Zaxxon
- - TechnoCop [needs screenshots]
+ - TechnoCop
  - Triad
  - Wings of Fury
  - Winter Games
