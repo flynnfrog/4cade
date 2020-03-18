@@ -6,10 +6,9 @@
 ; YE OLDE GRAND UNIFIED MEMORY MAP
 ;
 ; LC RAM BANK 1
-; D000..E8DF - persistent data structures (per-game cheat categories,
-;              gGlobalPrefsStore, gGamesListStore)
+; D000..E27D - persistent data structures (gGlobalPrefsStore, gGamesListStore)
 ; ...unused...
-; EB2C..FFF9 - main program code
+; EAAC..FFF9 - main program code
 ; FFFA..FFFF - NMI, reset, IRQ vectors
 ;
 ; LC RAM BANK 2
@@ -123,7 +122,7 @@ EnableAccelerator  = DisableAccelerator+3
 MOCKINGBOARD_SLOT = %00001111
 HAS_SPEECH        = %10000000
 
-; AND masks for game info bitfield (after game title in gGamesList)
+; AND masks for game info bitfield (after game display name in gGamesListStore)
 HAS_DHGR_TITLE    = %10000000        ; this one is hard-coded via BMI instead of AND/BNE
 CHEAT_CATEGORY    = %00001111
 
@@ -136,5 +135,5 @@ SUPPORTS_SHR   = %00110000
 CHEATS_ENABLED = %00001000
 
 ; VBL functions
-WaitForVBL   = $FCB2
-UnwaitForVBL = $FCC7
+WaitForVBL   = $FCB0
+UnwaitForVBL = $FCC5
