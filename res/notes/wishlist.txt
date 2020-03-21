@@ -60,11 +60,9 @@ Bandits
 Injured Engine
 Jawbreaker ][
 Mating Zone [priority]
-Test Drive [DHGR] [priority]
 
 //other
 Battle Chess [DHGR]
-Columns IIe [DHGR][priority]
 IO Silver [priority]
 Castle Smurfenstein
 Dino Smurf
