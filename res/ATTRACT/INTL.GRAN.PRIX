@@ -1,1 +1,7 @@
-## Attract mode for International Gran Prix#ACTION.HGR/INTL.GRAN.PRIX=A[eof]
+#
+# Attract mode for International Gran Prix
+#
+
+ACTION.HGR/INTL.GRAN.PRIX=A
+
+[eof]

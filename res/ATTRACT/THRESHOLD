@@ -1,1 +1,7 @@
-## Attract mode for #ACTION.HGR/THRESHOLD=A[eof]
+#
+# Attract mode for 
+#
+
+ACTION.HGR/THRESHOLD=A
+
+[eof]
