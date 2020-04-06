@@ -1,24 +1,25 @@
-
             Roll to the goal
 
 
 
-            joystick to move
+          joystick or keyboard
 
-         keyboard to move 8-way
-
+             8-way movement
 
 
 Player #1                      Player #2
 
+
 Q   W   E                      I   O   P
-  A   D           move           K   ;
+
+A       D         move         K       ;
+
 Z   X   C                      ,   .   /
 
 
-open apple       boost      closed apple
+    $          accelerate          %
 
 
 
-Esc* * * * * * * * * * * * * * * * pause
+              Esc to pause
 [eof]
