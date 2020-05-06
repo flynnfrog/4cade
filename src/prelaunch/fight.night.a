@@ -1,20 +1,20 @@
 ;license:MIT
-;(c) 2020 by qkumba/Frank M.
+;(c) 2020 by qkumba
 
 !cpu 6502
-!to "build/PRELAUNCH/BEACH.HEAD",plain
+!to "build/PRELAUNCH/FIGHT.NIGHT",plain
 *=$106
 
     !source "src/prelaunch/common.a"
 
          +ENABLE_ACCEL
          lda   #$60
-         sta   $887
-         jsr   $800       ; decompress
+         sta   $A21
+         jsr   $800       ; load "DOS"
 
-         +NEW_RESET_VECTOR $BFF0
+         +LC_REBOOT
          +DISABLE_ACCEL
-         jmp   $8000
+         jmp   $B700
 
 !if * > $1C0 {
   !error "code is too large, ends at ", *
