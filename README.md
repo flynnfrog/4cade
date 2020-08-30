@@ -19,7 +19,7 @@ $ cd 4cade/
 $ make
 ```
 
-If all goes well, the `build/` subdirectory will contain a `4cade.2mg` image which can be mounted in emulators like [OpenEmulator](https://archive.org/details/OpenEmulatorSnapshots) or [Virtual II](http://virtualii.com/).
+If all goes well, the `build/` subdirectory will contain a `4cade.hdv` image which can be mounted in emulators like [OpenEmulator](https://archive.org/details/OpenEmulatorSnapshots) or [Virtual II](http://virtualii.com/).
 
 ## Windows
 
@@ -36,7 +36,7 @@ Then open a `CMD.EXE` window and type
 C:\> CD 4CADE
 C:\4cade> WINMAKE
 ```
-If all goes well, the `BUILD\` subdirectory will contain a `4CADE.2MG` image which can be mounted in emulators like [AppleWin](https://github.com/AppleWin/AppleWin).
+If all goes well, the `BUILD\` subdirectory will contain a `4CADE.HDV` image which can be mounted in emulators like [AppleWin](https://github.com/AppleWin/AppleWin).
 
 # Navigating the code
 
