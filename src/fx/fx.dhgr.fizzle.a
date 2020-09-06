@@ -1,84 +1,63 @@
 ;license:MIT
-;(c) 2017-2020 by qkumba/4am
+;(c) 2017-2020 by qkumba/4am/John Brooks
 ;
 !cpu 6502
 !to "build/FX/DHGR.FIZZLE",plain
 *=$6000
 
-rnd1=$fe
-rnd2=$ff
+addrs=$6100
 
-; performance notes:
-; old:                    10657266..12247971 = 1590705
-; new:                    10196445..11493278 = 1296833
-
-         jsr   CopySelfToAuxmem
-
-         ;init RNG
-
-         ldy   #1
-         sty   rnd1
-         dey
-         sty   rnd2
-
-         ;iterate
-
-         ldx   rnd2
-@loop
-         lda   rnd1
-@loop2
-         eor   #$ff
-         sta   $26
-         sta   $3c
-         lsr   rnd2
-         ror   rnd1
-         bcc   +
-
-         ;feedback polynomial forms #$2015 for period of 16383
-
-         lda   rnd1
-         eor   #$15
-         sta   rnd1
-         lda   rnd2
+         ldx   #$1F                  ; build address lookup table
+-        txa
          eor   #$20
-         sta   rnd2
+         sta   addrs, x
+         eor   #$80
+         sta   addrs+$20, x
+         dex
+         bpl   -
+         ldx   #(end-start)          ; copy LFSR code to zero page
+-        lda   start-1, x
+         sta   $0, x
+         dex
+         bne   -
+         txa
+         tay
+         pha
+         pha
+         rts
 
-         ;little hack to avoid missing offset zero
-         ;screen hole at $xxFF is missed instead
-
-+        txa
-         and   #$1f
-
-         ;target page 1
-
-         ora   #$20
-         sta   $27
+start
+!pseudopc 1 {
+; in: X,Y=0
+loop     txa
+loop1    eor   #$35                  ; LFSR form 0x3500 with period 16383
+         tax
+loop2    lda   addrs, x
+         bpl   +
+         and   #$7F
+         sta   $C003
+         sta   $C005
++        sta   <dst+2
          eor   #$60
-         sta   $3d
-
-         ;copy pixel from other page to this page
-
-         cpx   #$20
-         bcc   +
-         sta   $c003
-         sta   $c005
-+        lda   ($3c),y
-         sta   ($26),y
-         sta   $c002
-         sta   $c004
-
-        ;exit conditions
-
-         ldx   rnd2
-         bne   @loop
-
-         lda   $c000
-         bmi   @exit
-
-         lda   rnd1
-         cmp   #1
-         bne   @loop2
-
-@exit    rts
-
-         !source "src/fx/fx.dhgr.common.a"
+         sta   <src+2
+src      lda   $FD00, y
+dst      sta   $FD00, y
+         sta   $C002
+         sta   $C004
+         txa
+         lsr
+         tax
+         tya
+         ror
+         tay
+         bcc   loop2
+         bne   loop
+         bit   $C000
+         bmi   exit
+         txa
+         bne   loop1
+exit     lda   $4000                 ; last lousy byte (because LFSR never hits 0)
+         sta   $2000
+         rts
+}
+end
