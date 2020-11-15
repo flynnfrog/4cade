@@ -9,6 +9,7 @@ mirror_cols    = $BE00    ; $28 bytes
 hgr1hi         = $BE40    ; $C0 bytes
 hgr1himirror   = $BF40    ; $C0 bytes
 Coordinates1Bit= $8800    ; $3481 bytes ($3480 on disk + 1 byte EOF marker)
+EndCoordinates1Bit=Coordinates1Bit+$3480
 
          !source "src/fx/macros.a"
 
@@ -129,8 +130,9 @@ InitOnce
          +READ_RAM2_WRITE_RAM2
          +LOAD_FILE_AT .CoordinatesFile, Coordinates1Bit
          +READ_RAM1_WRITE_RAM1
-         lda   #$80
-         sta   Coordinates1Bit + $3480
+         ; data file must contain this EOF marker
+         ;lda   #$80
+         ;sta   EndCoordinates1Bit
 }
 
 !macro FX_REVERSE_1BIT {
@@ -138,9 +140,9 @@ InitOnce
          sty   $f0
          lda   #>Coordinates1Bit
          sta   $f1
-         lda   #<(Coordinates1Bit + $3480 - 2)
+         lda   #<(EndCoordinates1Bit - 2)
          sta   $f2
-         lda   #>(Coordinates1Bit + $3480 - 2)
+         lda   #>(EndCoordinates1Bit - 2)
          sta   $f3
          clc
          !byte $24
@@ -174,7 +176,7 @@ InitOnce
 ++
 }
 
-!macro FX_RIPPLE_1BIT {
+!macro FX_RIPPLE_1BIT .target {
          lda   #2                    ; <(Coordinates1Bit + 2)
          sta   $f0
          ldy   #0
@@ -200,7 +202,7 @@ InitOnce
 ---      ldx   #4
 --       ldy   $ee, x
          lda   $ef, x
-         jsr   aslmod
+         jsr   .target
          sty   $ee, x
          sta   $ef, x
          sty   $ec
@@ -229,9 +231,10 @@ InitOnce
          dec   $ef
          bpl   ---
          bmi   +++                   ; always branches
-aslmod
-         jsr   +
-+        cmp   #$1A
+aslmod4  jsr   aslmod
+aslmod3  jsr   aslmod
+aslmod2  jsr   aslmod
+aslmod   cmp   #$1A
          bcc   +
          bne   ++
          cpy   #$40
