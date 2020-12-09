@@ -16,6 +16,7 @@
  - Beach-Head
  - Beach-Head II
  - Bejeweled
+ - Boa
  - Bop'n Wrestle
  - Borg
  - Boulder Dash
@@ -119,6 +120,7 @@
  - Who Framed Roger Rabbit
  - Wings of Fury
  - Winter Games
+ - World Games
  - World Karate Championship
  - Zargs
 
